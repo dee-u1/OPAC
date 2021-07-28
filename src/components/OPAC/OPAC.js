@@ -1,23 +1,13 @@
 import React, { useEffect, useState }   from 'react';
-import Button from "react-bootstrap/Button"
-import { AiFillCarryOut, AiFillDelete } from "react-icons/ai";
-import Book from './Book';
 import Books from './Books';
+import Students from './Students';
 import Login from './Login';
 import SearchBook from './SearchBook';
-
-
+import SearchResult from './SearchResult';
 import Nav from "react-bootstrap/Nav"
 import Navbar from "react-bootstrap/Navbar"
 import Container from "react-bootstrap/Container"
-// import FormControl from "react-bootstrap/FormControl"
-// import { LinkContainer } from 'react-router-bootstrap';
-// import InputGroup from 'react-bootstrap/InputGroup';
-// import DropdownButton from 'react-bootstrap/DropdownButton'
-// import Dropdown  from 'react-bootstrap/Dropdown'
-// import BootstrapSelect from 'react-bootstrap-select-dropdown';
-// import Form from 'react-bootstrap/Form';
-
+import AddEditStudent from './AddEditStudent';
 import {
     MemoryRouter,
     BrowserRouter as Router,
@@ -27,7 +17,6 @@ import {
     NavLink,
     useHistory
   } from "react-router-dom";
-
 import './opac.css';
 
 const OPAC = (props) => {
@@ -48,30 +37,81 @@ const OPAC = (props) => {
             {"ISBN" : "013", "title": "Lord of the Rings", "author": "Tolkien, J.R.", "edition": 1937, "publication": "Penguin"},
         ]
     )
+    const [students,setStudents] = useState(
+        [
+            {
+                IDNum: '0001',
+                firstName: 'Rodelio',
+                lastName: 'Rodriguez',
+                userName: 'dee-u',
+                password: 'mahaba',
+                confirmpassword: ''
+            },
+            {
+                IDNum: '0002',
+                firstName: 'Bill',
+                lastName: 'Gates',
+                userName: 'bill',
+                password: 'mahaba',
+                confirmpassword: ''
+            }
+    ]
+    )
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [searchResult, setSearchResult] = useState([]);
+    const [showDataEntry, setShowDataEntry]=useState(false);
+
+    const history = useHistory();
 
     const adminLogin=(e)=>{
         setIsLoggedIn(e);        
     }
+   
+    const setBookSearchResult = (data) => {
+        setSearchResult(data);
+    }
 
-    const removeBook = (ISBN) => {
-        
+    const removeBook = (ISBN) => {        
         let booksCopy = [...books];
-
         const index = booksCopy.findIndex(element => element.ISBN === ISBN);
-
         booksCopy.splice(index, 1);
-
         setBooks(booksCopy);
     }
 
-    let booksDisplay = books.map(book => 
-        <Book 
-            key={book.ISBN} 
-            book={book} 
-            isLoggedIn={isLoggedIn} 
-            deleteBook={removeBook}
-        />)
+    const addNewBook = (book) => {
+        let booksCopy = [...books];
+        let index = booksCopy.findIndex(item => item.ISBN === book.ISBN);
+        if (index !== -1){
+            alert("Cannot add, book's ISBN is already existing!");
+        }
+        else {            
+            booksCopy.push(book);    
+            setBooks(booksCopy);
+        }        
+    }
+
+    const updateBook = (book) => {
+        let booksCopy = [...books];
+        const index = booksCopy.findIndex(item => item.ISBN === book.ISBN);
+        booksCopy[index] = book;
+        setBooks(booksCopy);
+    }
+   
+    const handleClose = (e) => {
+        setShowDataEntry(e);
+    };
+
+    const addNewStudent = (student) => {
+        let studentsCopy = [...students];
+        let index = studentsCopy.findIndex(item => item.IDNum === student.IDNum);
+        if (index !== -1){
+            alert("Cannot add new student, ID No. is already existing!");
+        }
+        else {            
+            studentsCopy.push(student); 
+            setStudents(studentsCopy);
+        }        
+    }
 
     return (
         <Router>
@@ -80,16 +120,22 @@ const OPAC = (props) => {
                 <Navbar.Brand as={Link} to="/">Online Public Access Catalogue</Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
-                    <Nav className="me-auto">
-                        <Nav.Link as={Link} to="/home">Home</Nav.Link>
-                        <Nav.Link as={Link} to='/books'>Books</Nav.Link>
+                    <Nav className="me-auto">                       
+                        {isLoggedIn ?
+                            <Nav>
+                            <Nav.Link as={Link} to='/books'>Books</Nav.Link> 
+                            <Nav.Link as={Link} to='/students'>Students</Nav.Link> 
+                            </Nav>
+                            : ''
+                        }
                     </Nav>
                     {isLoggedIn ?
                         <Nav>
                             <Nav.Link as={Link} to="/logout">Log-out</Nav.Link>
                         </Nav> :
                         <Nav>
-                            <Nav.Link as={Link} to="/login">Log-in</Nav.Link>
+                            <Nav.Link as={Link} to="/register">Register</Nav.Link>
+                            <Nav.Link as={Link} to="/login">Log-in</Nav.Link>                            
                         </Nav>
                     }
                 </Navbar.Collapse>
@@ -97,16 +143,25 @@ const OPAC = (props) => {
             </Navbar>
             <Switch>
             <Route path="/books">
-                <Books books={booksDisplay} adminLogin={adminLogin} isLoggedIn={isLoggedIn} />
+                <Books books={books} adminLogin={adminLogin} isLoggedIn={isLoggedIn} addNewBook={addNewBook} deleteBook={removeBook} updateBook={updateBook} />
+            </Route>
+            <Route path="/students">
+                <Students students={students} />
             </Route>
             <Route path="/login">
-                <Login adminLogin={adminLogin} />
+                <Login show={true} handleClose={handleClose} adminLogin={adminLogin} />
             </Route>
             <Route path="/logout">
-                <SearchBook adminLogin={adminLogin} isLoggedIn={false} />
+                <SearchBook adminLogin={adminLogin} isLoggedIn={false} BookSearchResult={setBookSearchResult} books={books} />
+            </Route>
+            <Route path="/searchresult">
+                <SearchResult isLoggedIn={isLoggedIn} searchBooks={searchResult} />
+            </Route>
+            <Route path="/register">
+                <AddEditStudent show={true} handleClose={handleClose} addStudent={addNewStudent} />
             </Route>
             <Route path="/">
-                <SearchBook adminLogin={adminLogin}  isLoggedIn={isLoggedIn} />
+                <SearchBook adminLogin={adminLogin} isLoggedIn={isLoggedIn} BookSearchResult={setBookSearchResult} books={books}  />
             </Route>
             </Switch>
         </Router>            

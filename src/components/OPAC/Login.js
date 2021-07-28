@@ -1,7 +1,10 @@
 import React, {useState} from "react";
+import Modal from 'react-bootstrap/Modal'
+import Button from 'react-bootstrap/esm/Button';
 import { useHistory } from "react-router-dom";
 
 const Login = (props) => {
+    const [show, setShow] = useState(props.show);
     const [loginData, setLoginData] = useState({
             username: '',
             password: ''
@@ -9,7 +12,6 @@ const Login = (props) => {
     )
 
     const history = useHistory();
-    //alert(history);      
 
     const inputChangeHandler = (e) => {
         setLoginData({
@@ -22,20 +24,30 @@ const Login = (props) => {
         if (loginData.username==="test" && loginData.password==="test"){
             props.adminLogin(true);
             alert("Credentials found");
-            history.push("/home");
+            history.push("/books");
+            setShow(false);
         }
         else{
             alert("Wrong username or password");
         }
     }
 
-    return (
-        <div className="auth-wrapper">
-            <div className="auth-inner">
-                <h3>Log-in</h3>
+    const handleClose = () => {
+        setShow(false);
+        props.handleClose(false);
+        history.push("/");
+    };
 
-                <div className="form-group">
-                    <label>Username:</label>
+    return (
+        <>
+        <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Log-in</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                
+                <div className="form-group">       
+                    <label htmlFor="username">Username:</label>
                     <input 
                         name="username"
                         type="text" 
@@ -45,9 +57,8 @@ const Login = (props) => {
                         onChange={inputChangeHandler} 
                     />
                 </div>
-                <br />
-                <div className="form-group">
-                    <label>Password:</label>
+                <div className="form-group">       
+                    <label htmlFor="author">Password:</label>
                     <input 
                         name="password"
                         type="password" 
@@ -56,12 +67,14 @@ const Login = (props) => {
                         value={loginData.password}
                         onChange={inputChangeHandler} 
                     />
-                </div>
-                <br />
-                <button className="btn btn-primary btn-block" onClick={btnClickHandler} >Submit</button>
-        
-            </div>
-      </div>
+                </div>                         
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose} >Close</Button>
+                    <Button variant="primary" onClick={btnClickHandler}>Ok</Button>
+                </Modal.Footer>
+            </Modal>         
+        </>
     );
 }
 

@@ -11,9 +11,21 @@ const Book = (props) => {
             publication: props.book.publication
         }
     );
+
+    useEffect(() => {
+        if (props.book) {
+            setBook({
+                ISBN: props.book.ISBN,
+                title : props.book.title,
+                author: props.book.author,
+                edition: props.book.edition,
+                publication: props.book.publication
+            });
+        }
+    },[props.book]);
     
     const editBtnClickHandler = () => {
-        
+        props.editBook(book, book.ISBN)
     }
 
     const deleteBtnClickHandler = () => {
@@ -34,14 +46,14 @@ const Book = (props) => {
             <td>
                 {book.edition} 
             </td>
-            <td>
+            <td className="d-none d-lg-block">
                 {book.publication} 
             </td>
             {props.isLoggedIn ?
                 <td>
                     <Button variant="success" onClick={editBtnClickHandler}><AiFillEdit /></Button>{' '}
                     <Button variant="danger" onClick={deleteBtnClickHandler}><AiFillDelete /></Button>
-                </td> : ''
+                </td> : null
             }
         </tr>
     );

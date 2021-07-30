@@ -1,5 +1,6 @@
 import React, { useEffect, useState }   from 'react';
 import Books from './Books';
+import Books2 from './Books2';
 import Students from './Students';
 import Login from './Login';
 import SearchBook from './SearchBook';
@@ -18,6 +19,7 @@ import {
     useHistory
   } from "react-router-dom";
 import './opac.css';
+//by Rodelio M. Rodriguez
 
 const OPAC = (props) => {
     const [books,setBooks] = useState(
@@ -143,7 +145,7 @@ const OPAC = (props) => {
             </Navbar>
             <Switch>
             <Route path="/books">
-                <Books books={books} adminLogin={adminLogin} isLoggedIn={isLoggedIn} addNewBook={addNewBook} deleteBook={removeBook} updateBook={updateBook} />
+                <Books2 books={books} adminLogin={adminLogin} isLoggedIn={isLoggedIn} addNewBook={addNewBook} deleteBook={removeBook} updateBook={updateBook} />
             </Route>
             <Route path="/students">
                 <Students students={students} />
